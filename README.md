@@ -14,6 +14,7 @@
 
 
 ## File Locations
+```
 main_folder/
 ├── getfastas.py
 ├── run_esmfold.sh
@@ -25,7 +26,7 @@ main_folder/
     └── lowest_energies/
         ├── makeresultsfolder.sh
         └── getscripts.py
-
+```
 ## Downloading FASTA Files
 First, you need to download the FASTA files for all of the proteins you are using. Since we are getting them for this project from a list from PDB, we can use the script `get_fastas.py` documents for which can be found [here](docs/getfastas.md). Run the script using:
 ```bash
