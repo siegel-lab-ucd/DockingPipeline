@@ -12,6 +12,20 @@
 9. [Docking Process](#docking-process)
 10. [Final Steps](#final-steps)
 
+
+## File Locations
+main_folder/
+├── getfastas.py
+├── run_esmfold.sh
+└── pdbs/
+    ├── bulkrelax.py
+    ├── organizecleanedpdbs.py
+    ├── organizeenergies.py
+    ├── organizepdbs.py
+    └── lowest_energies/
+        ├── makeresultsfolder.sh
+        └── getscripts.py
+
 ## Downloading FASTA Files
 First, you need to download the FASTA files for all of the proteins you are using. Since we are getting them for this project from a list from PDB, we can use the script `get_fastas.py` documents for which can be found [here](docs/getfastas.md). Run the script using:
 ```bash
