@@ -13,14 +13,14 @@
 10. [Final Steps](#final-steps)
 
 ## Downloading FASTA Files
-First, you need to download the FASTA files for all of the proteins you are using. Since we are getting them for this project from a list from PDB, we can use the script `get_fastas.py` which can be found [here](docs/getfastas.md). Run the script using:
+First, you need to download the FASTA files for all of the proteins you are using. Since we are getting them for this project from a list from PDB, we can use the script `get_fastas.py` documents for which can be found [here](docs/getfastas.md). Run the script using:
 ```bash
 python get_fastas.py
 ```
 If you are using this workflow for another project, procure the FASTA files yourself.
 
 ## Folding Proteins
-Once you have all of the FASTA files, you can fold them using the script `run_esmfold.sh` which can be found [here](docs/runesmfold.md). Run the script using:
+Once you have all of the FASTA files, you can fold them using the script `run_esmfold.sh` documents for which can be found [here](docs/runesmfold.md). Run the script using:
 ```bash
 bash run_esmfold.sh $fastapath $outputdirectory
 ```
@@ -32,37 +32,37 @@ python organizepdbs.py
 ```
 
 ## Cleaning PDB Files
-Next, everything needs to be cleaned. Use the script `cleanpdbs.sh` which can be found [here](docs/cleanpdbs.md). Run the script using:
+Next, everything needs to be cleaned. Use the script `cleanpdbs.sh` documents for which can be found [here](docs/cleanpdbs.md). Run the script using:
 ```bash
 bash cleanpdbs.sh
 ```
 
 ## Organizing Cleaned PDB Files
-Once everything is cleaned, we need to get them in the appropriate folders. This can be done with `organizecleanedpdbs.py` which can be found [here](docs/organizecleanedpdbs.md). Run the script using:
+Once everything is cleaned, we need to get them in the appropriate folders. This can be done with `organizecleanedpdbs.py` documents for which can be found [here](docs/organizecleanedpdbs.md). Run the script using:
 ```bash
 python organizecleanedpdbs.py
 ```
 This will create new folders with the `_cleaned` tag for our later relaxing.
 
 ## Relaxing Structures
-Next, we need to relax everything. We can use the script `bulkrelax.py` which can be found [here](docs/bulkrelax.md). Run the script using:
+Next, we need to relax everything. We can use the script `bulkrelax.py` documents for which can be found [here](docs/bulkrelax.md). Run the script using:
 ```bash
 python bulkrelax.py
 ```
 This will submit SLURM jobs for each of the PDB files to relax them. **IMPORTANT:** Only do this step once, as it looks for PDB files within the cleaned folder. If you have new PDB files from your first run, it will submit a job for those too, potentially flooding CACAO. If you need to redo this step, delete everything in the cleaned folders and start from the cleaning step again.
 
 ## Selecting Lowest Energy Models
-Now we need to get the lowest energy model from the relaxed structures. This can be done using the script `organizeenergies.py` which can be found [here](docs/organizeenergies.md). Run the script using:
+Now we need to get the lowest energy model from the relaxed structures. This can be done using the script `organizeenergies.py` documents for which can be found [here](docs/organizeenergies.md). Run the script using:
 ```bash
 python organizeenergies.py
 ```
 This script moves the lowest energy model to its own folder for docking.
 
 ## Preparing for Docking
-Next, we need to get the docking scripts from the other files. This can be done using the `getscripts.py` script which can be found [here](docs/getscripts.md) in the `lowest_energies` folder. If you are copying this pipeline for your own proteins, you can view them in the `docking_scripts` folder and view their documentation [here](docs/dockingscripts.md).
+Next, we need to get the docking scripts from the other files. This can be done using the `getscripts.py` script documents for which can be found [here](docs/getscripts.md) in the `lowest_energies` folder. If you are copying this pipeline for your own proteins, you can view them in the `docking_scripts` folder and view their documentation [here](docs/dockingscripts.md).
 
 ## Docking Process
-Remember, for docking, we need to have a results folder ready. You can use the `makeresultsfolder.sh` script which can be found [here](docs/makeresultsfolder.md). Run the script using:
+Remember, for docking, we need to have a results folder ready. You can use the `makeresultsfolder.sh` script documents for which can be found [here](docs/makeresultsfolder.md). Run the script using:
 ```bash
 bash makeresultsfolder.sh
 ```
