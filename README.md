@@ -34,7 +34,7 @@ python get_fastas.py
 If you are using this workflow for another project, procure the FASTA files yourself.
 
 ## Folding Proteins
-Once you have all of the FASTA files, you can fold them using the script `run_esmfold.sh` documents for which can be found [here](docs/runesmfold.md). Run the script using:
+Once you have all of the FASTA files, you can fold them using the script `run_esmfold.sh` documents for which can be found [here](docs/run_esmfold.md). Run the script using:
 ```bash
 bash run_esmfold.sh $fastapath $outputdirectory
 ```
