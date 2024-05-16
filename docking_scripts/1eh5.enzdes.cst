@@ -1,0 +1,66 @@
+# for enzdes benchmark
+# SJB 1-28-2016
+
+#Ser 114 nucleophile
+
+CST::BEGIN
+
+  TEMPLATE::    ATOM_MAP:   1     atom_name: C2 O1 C1
+  TEMPLATE::    ATOM_MAP:   1     residue3: 1eh
+
+  TEMPLATE::    ATOM_MAP:   2     atom_name: OG CB CA
+  TEMPLATE::    ATOM_MAP:   2     residue1: S
+
+  CONSTRAINT::  distanceAB: 1.3   0.10   100.0   1 #covalent intermediate, so turns off VDW 
+
+  CONSTRAINT::    angle_A:  120.0   20.00 100  360.00   1
+  CONSTRAINT::    angle_B:  120.0   20.00 100  360.00   1
+  CONSTRAINT::  torsion_A:  180.0   10.00 100  360.00   1
+    
+CST::END
+
+# HIS 289 to SER 114
+
+CST::BEGIN
+  TEMPLATE::    ATOM_MAP:   1   atom_name: OG CB CA
+  TEMPLATE::    ATOM_MAP:   1   residue1: S
+
+  TEMPLATE::    ATOM_MAP:   2   atom_name: NE2 CE1 ND1
+  TEMPLATE::    ATOM_MAP:   2   residue1: H
+
+  CONSTRAINT:: distanceAB:    3.6  0.3 100.0 0
+  CONSTRAINT::    angle_B:  110.0 10.00 100  360.00   1
+  CONSTRAINT::  torsion_B:  165.0 10.0  100   180
+    
+CST::END
+
+
+# HIS 289 to ASP 233
+
+CST::BEGIN
+  TEMPLATE::    ATOM_MAP:   1   atom_name: OD2 CG CB
+  TEMPLATE::    ATOM_MAP:   1   residue1: D
+
+  TEMPLATE::    ATOM_MAP:   2   atom_name: ND1 CG CB
+  TEMPLATE::    ATOM_MAP:   2   residue1: H
+
+  CONSTRAINT:: distanceAB:    2.8   0.3  100     0
+  CONSTRAINT::    angle_B:  110.0   10   100   360  1
+  CONSTRAINT::  torsion_B:  15.0    10   100   180
+    
+CST::END
+
+# oxyanion interactions with nbb from met 41
+
+CST::BEGIN
+
+  TEMPLATE::    ATOM_MAP:   1     atom_name: O1 C2 C3
+  TEMPLATE::    ATOM_MAP:   1     residue3: 1eh
+
+  TEMPLATE::    ATOM_MAP:   2     atom_name: N CA C
+  TEMPLATE::    ATOM_MAP:   2     residue1: M
+
+  CONSTRAINT::  distanceAB:    3.0    0.3   100.0   0
+  CONSTRAINT::     angle_A:  130.0  10 100  360.00  1
+  CONSTRAINT::   torsion_A:  -76.0  10 100  360.00  1	
+CST::END
