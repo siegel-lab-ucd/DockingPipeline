@@ -1,107 +1,183 @@
-# Protein Modeling and Docking Workflow
+# Protein Modeling and Docking Pipeline
 
-## Table of Contents
-1. [Downloading FASTA Files](#downloading-fasta-files)
-2. [Folding Proteins](#folding-proteins)
-3. [Organizing PDB Files](#organizing-pdb-files)
-4. [Cleaning PDB Files](#cleaning-pdb-files)
-5. [Organizing Cleaned PDB Files](#organizing-cleaned-pdb-files)
-6. [Relaxing Structures](#relaxing-structures)
-7. [Selecting Lowest Energy Models](#selecting-lowest-energy-models)
-8. [Preparing for Docking](#preparing-for-docking)
-9. [Docking Process](#docking-process)
-10. [Final Steps](#final-steps)
+A comprehensive pipeline for protein modeling with ESMFold and docking with Rosetta.
 
+## Overview
 
-## File Locations
+This pipeline automates the process of:
+1. Retrieving protein sequences from PDB
+2. Folding proteins using ESMFold
+3. Cleaning and organizing PDB structure files
+4. Performing structure relaxation
+5. Running docking simulations
+6. Filtering and analyzing results
+
+## Prerequisites
+
+- Python 3.6+
+- Pandas
+- Matplotlib
+- PyMOL (for protein-ligand visualization)
+- Access to SLURM-based compute cluster with Rosetta installed
+- ESMFold (local or via API)
+
+## Pipeline Steps
+
+### 1. Download FASTA Files
+
+Download protein sequences in FASTA format:
+
+```bash
+python getfastas.py
 ```
-main_folder/
-├── getfastas.py
-├── run_esmfold.sh
-└── pdbs/
-    ├── bulkrelax.py
-    ├── organizecleanedpdbs.py
-    ├── organizeenergies.py
-    ├── organizepdbs.py
-    └── lowest_energies/
+
+For detailed documentation, see [docs/getfastas.md](docs/getfastas.md).
+
+### 2. Fold Protein Structures
+
+Generate 3D protein structures using ESMFold:
+
+```bash
+bash run_esmfold.sh /path/to/fasta/files /path/to/output/directory
+```
+
+For detailed documentation, see [docs/run_esmfold.md](docs/run_esmfold.md).
+
+### 3. Organize PDB Files
+
+Organize the generated structures:
+
+```bash
+python pdbs/organizepdbs.py
+```
+
+For detailed documentation, see [docs/organizepdbs.md](docs/organizepdbs.md).
+
+### 4. Clean PDB Files
+
+Remove extraneous information and prepare files for Rosetta:
+
+```bash
+bash pdbs/cleanpdbs.sh
+```
+
+For detailed documentation, see [docs/cleanpdbs.md](docs/cleanpdbs.md).
+
+### 5. Organize Cleaned PDB Files
+
+Sort and organize the cleaned structures:
+
+```bash
+python pdbs/organizecleanedpdbs.py
+```
+
+This creates directories with the `_cleaned` suffix. For detailed documentation, see [docs/organizecleanedpdbs.md](docs/organizecleanedpdbs.md).
+
+### 6. Relax Structures
+
+Submit jobs to relax the protein structures using Rosetta:
+
+```bash
+python pdbs/bulkrelax.py
+```
+
+⚠️ **IMPORTANT:** Only run this once! Running it multiple times will submit duplicate jobs. If you need to redo this step, first delete all files in the cleaned folders.
+
+For detailed documentation, see [docs/bulkrelax.md](docs/bulkrelax.md).
+
+### 7. Select Lowest Energy Models
+
+Identify and extract the lowest energy structures:
+
+```bash
+python pdbs/organizeenergies.py
+```
+
+For detailed documentation, see [docs/organizeenergies.md](docs/organizeenergies.md).
+
+### 8. Prepare for Docking
+
+Get required docking scripts and files:
+
+```bash
+python pdbs/lowest_energies/getscripts.py
+```
+
+For detailed documentation, see [docs/getscripts.md](docs/getscripts.md).
+
+### 9. Create Results Directory
+
+Prepare the output directory for docking results:
+
+```bash
+bash pdbs/lowest_energies/makeresultsfolder.sh
+```
+
+For detailed documentation, see [docs/makeresultsfolder.md](docs/makeresultsfolder.md).
+
+### 10. Prepare Protein-Ligand Complex
+
+Using PyMOL, prepare the protein-ligand complex:
+
+1. Open the folded protein file
+2. Open the template protein-ligand complex
+3. Align the proteins
+4. Delete the template protein, keeping only the ligand
+5. Save the new complex as a PDB file
+6. Update `docking_scripts/run.sh` with the correct PDB filename
+
+### 11. Add PDB Header
+
+Add the required header information to your PDB:
+
+```bash
+cat docking_scripts/1eh5.header your_model.pdb > your_model_with_header.pdb
+```
+
+### 12. Run Docking
+
+Submit the docking job to the cluster:
+
+```bash
+cd docking_scripts
+sbatch run.sh
+```
+
+### 13. Filter Results
+
+Once docking is complete, filter and analyze the results:
+
+```bash
+python filter.py
+# OR
+python gettop5.py
+```
+
+The `gettop5.py` script extracts the top 5 models by energy score and copies them to a `top5` directory.
+
+## Directory Structure
+
+```
+DockingPipeline/
+├── getfastas.py              # Download FASTA files
+├── run_esmfold.sh            # Run ESMFold for structure prediction
+├── filter.py                 # Simple filter for docking results
+├── gettop5.py                # Extract top 5 models by energy
+├── docking_scripts/          # Rosetta docking configuration files
+├── docs/                     # Detailed documentation
+└── pdbs/                     # Scripts for PDB processing
+    ├── bulkrelax.py          # Structure relaxation
+    ├── cleanpdbs.sh          # PDB cleaning script
+    ├── organizecleanedpdbs.py # Sort cleaned PDBs
+    ├── organizeenergies.py    # Extract lowest energy models
+    ├── organizepdbs.py        # Sort generated PDBs
+    └── lowest_energies/       # Scripts for final processing
         ├── makeresultsfolder.sh
         └── getscripts.py
 ```
-## Downloading FASTA Files
-First, you need to download the FASTA files for all of the proteins you are using. Since we are getting them for this project from a list from PDB, we can use the script `get_fastas.py` documents for which can be found [here](docs/getfastas.md). Run the script using:
-```bash
-python get_fastas.py
-```
-If you are using this workflow for another project, procure the FASTA files yourself.
 
-## Folding Proteins
-Once you have all of the FASTA files, you can fold them using the script `run_esmfold.sh` documents for which can be found [here](docs/run_esmfold.md). Run the script using:
-```bash
-bash run_esmfold.sh $fastapath $outputdirectory
-```
+## Troubleshooting
 
-## Organizing PDB Files
-Your PDB files might be disorganized, so you can use the `organizepdbs.py` script to organize everything. The script can be found [here](docs/organizepdbs.md). Run the script using:
-```bash
-python organizepdbs.py
-```
-
-## Cleaning PDB Files
-Next, everything needs to be cleaned. Use the script `cleanpdbs.sh` documents for which can be found [here](docs/cleanpdbs.md). Run the script using:
-```bash
-bash cleanpdbs.sh
-```
-
-## Organizing Cleaned PDB Files
-Once everything is cleaned, we need to get them in the appropriate folders. This can be done with `organizecleanedpdbs.py` documents for which can be found [here](docs/organizecleanedpdbs.md). Run the script using:
-```bash
-python organizecleanedpdbs.py
-```
-This will create new folders with the `_cleaned` tag for our later relaxing.
-
-## Relaxing Structures
-Next, we need to relax everything. We can use the script `bulkrelax.py` documents for which can be found [here](docs/bulkrelax.md). Run the script using:
-```bash
-python bulkrelax.py
-```
-This will submit SLURM jobs for each of the PDB files to relax them. **IMPORTANT:** Only do this step once, as it looks for PDB files within the cleaned folder. If you have new PDB files from your first run, it will submit a job for those too, potentially flooding CACAO. If you need to redo this step, delete everything in the cleaned folders and start from the cleaning step again.
-
-## Selecting Lowest Energy Models
-Now we need to get the lowest energy model from the relaxed structures. This can be done using the script `organizeenergies.py` documents for which can be found [here](docs/organizeenergies.md). Run the script using:
-```bash
-python organizeenergies.py
-```
-This script moves the lowest energy model to its own folder for docking.
-
-## Preparing for Docking
-Next, we need to get the docking scripts from the other files. This can be done using the `getscripts.py` script documents for which can be found [here](docs/getscripts.md) in the `lowest_energies` folder. If you are copying this pipeline for your own proteins, you can view them in the `docking_scripts` folder and view their documentation [here](docs/dockingscripts.md).
-
-## Docking Process
-Remember, for docking, we need to have a results folder ready. You can use the `makeresultsfolder.sh` script documents for which can be found [here](docs/makeresultsfolder.md). Run the script using:
-```bash
-bash makeresultsfolder.sh
-```
-If you prefer, you can create the results folder yourself before starting the docking.
-
-Next, you need to merge your new protein with the ligand. There is no script for this step. We recommend using PyMOL:
-1. Open the new protein file first (due to limitations with Rosetta).
-2. Open the existing protein/ligand complex.
-3. Align them.
-4. Delete the existing protein.
-5. Export the newly modeled protein complexed with the original ligand as a molecule under a PDB file.
-6. Upload that back to the cluster and edit the `run.sh` file to include the name of the new PDB. 
-7. Add `#SBATCH --array=1-10` at the bottom of the list of SLURM commands so that it runs in an array.
-
-## Final Steps
-Finally, add the header to your PDB file by typing the following command:
-```bash
-cat headerfile inputpdb > outputfilename
-```
-If you are doing this with your own proteins, you must do this yourself.
-
-To complete the process, run the following command:
-```bash
-sbatch run.sh
-```
-Wait for everything to finish, and you're done!
- 
+- If jobs fail on the cluster, check SLURM output logs in the `logs` directory
+- Ensure all file paths are correct before running each step
+- For issues with structure alignment, try different alignment methods in PyMOL

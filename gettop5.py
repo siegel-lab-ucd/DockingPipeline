@@ -30,9 +30,16 @@ def process_directory(dirpath, top5_dir, combined_df):
         score_list.append(df)
 
     if score_list:
-        print(f"Combining dataframes and processing top 5 scores for {dirpath}")
+        print(f"Combining dataframes for {dirpath}")
         # Concatenate all dataframes into one
         df2 = pd.concat(score_list, ignore_index=True)
+
+        # Print the lowest all_cst value before filtering
+        if not df2.empty:
+            lowest_all_cst = df2['all_cst'].min()
+            print(f"Lowest all_cst for {os.path.basename(dirpath)}: {lowest_all_cst}")
+        else:
+            print(f"No valid entries for {os.path.basename(dirpath)}")
 
         # Filter rows based on condition
         df4 = df2[df2['all_cst'] < .2]
@@ -77,4 +84,3 @@ if combined_df:
     print("Combined CSV file created: top5_combined.csv")
 
 print("Process completed.")
-
