@@ -181,3 +181,22 @@ DockingPipeline/
 - If jobs fail on the cluster, check SLURM output logs in the `logs` directory
 - Ensure all file paths are correct before running each step
 - For issues with structure alignment, try different alignment methods in PyMOL
+
+## Methods
+
+### Protein Structure Prediction
+Protein structures were generated using ESMFold, a state-of-the-art protein structure prediction method based on the ESM-2 language model. ESMFold leverages an all-atom protein language model to predict 3D structures directly from primary amino acid sequences without requiring multiple sequence alignments or templates.
+
+### Structure Preparation and Relaxation
+Predicted structures underwent cleaning to remove non-essential information and were subsequently relaxed using Rosetta's energy minimization protocols. The relaxation process employed the REF2015 energy function with backbone minimization to relieve steric clashes and optimize hydrogen-bonding networks while maintaining the overall fold predicted by ESMFold.
+
+### Molecular Docking
+Protein-ligand docking was performed using Rosetta's enzyme design protocols. The docking procedure consisted of:
+
+1. **Initial Placement**: Ligands were positioned near predefined binding sites based on crystallographic data from template structures
+2. **Conformational Sampling**: Monte Carlo simulations with ligand translation/rotation using the Transform mover (box_size=20Å, move_distance=10Å, angle=360°) 
+3. **Interface Optimization**: Targeted repacking and minimization of protein side chains at the binding interface (6-12Å shell around ligand)
+4. **Energy Minimization**: Simultaneous minimization of ligand position, orientation, torsional angles, and protein side chains using the REF2015 energy function with constraints
+5. **Scoring and Ranking**: Models were scored using the REF2015 energy function with constraint terms and filtered based on total energy and constraint satisfaction
+
+For each protein target, 1000 docking simulations (10 SLURM array jobs × 100 structures) were performed to adequately sample the conformational space. The resulting models were filtered and ranked to identify the most energetically favorable binding poses.
